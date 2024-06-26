@@ -7,12 +7,14 @@ on:
 jobs:
   build:
     runs-on: [ubuntu-latest]
+    permissions:
+      packages: write
     container:
       image: ghcr.io/carlossg/maven:3.6.3-azulzulu-11-alpine
     steps:
       - uses: actions/checkout@v3
 
       - name: Build with Maven
-        run: mvn clean deploy
+        run: mvn clean deploy -Drevision=${{ github.release.tag_name }} -Dproject.version=$PROJECT_VERSION
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

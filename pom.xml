@@ -4,7 +4,7 @@
 
     <groupId>com.groww.infra</groupId>
     <artifactId>temporal-opentelemetry</artifactId>
-    <version>0.0.2</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -15,11 +15,6 @@
         <logback.version>1.4.12</logback.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-    <scm>
-        <developerConnection>scm:git:git@github.com:Groww-OSS/temporal-opentelemetry.git</developerConnection>
-        <tag>@{project.version}</tag>
-    </scm>
 
     <distributionManagement>
         <repository>
