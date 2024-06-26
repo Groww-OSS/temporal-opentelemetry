@@ -1,8 +1,8 @@
 name: Maven Package
 
 on:
-  repository_dispatch:
-    types: [release]
+  release:
+    types: [created]
 
 jobs:
   build:
@@ -13,4 +13,6 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Build with Maven
-        run: mvn -B release:prepare release:perform -Dresume=false
+        run: mvn clean deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
