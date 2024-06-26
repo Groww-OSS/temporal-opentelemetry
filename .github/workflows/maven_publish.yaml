@@ -15,6 +15,6 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Build with Maven
-        run: mvn clean deploy -Drevision=${{ github.release.tag_name }} -Dproject.version=$PROJECT_VERSION
+        run: mvn clean deploy -Drevision=${{ github.release.tag_name }} -Dproject.version=${{ github.release.tag_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
