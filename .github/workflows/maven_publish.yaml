@@ -14,12 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJSON(github) }}
-        run: echo "$GITHUB_CONTEXT"
-
       - name: Build with Maven
-        run: mvn clean deploy -Drevision=${{ github.event.release.tag_name }} -Dproject.version=${{ github.event.release.tag_name }}
+        run: mvn clean deploy -Drevision=${{ github.event.release.tag_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
