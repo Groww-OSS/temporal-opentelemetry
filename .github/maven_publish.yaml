@@ -1,0 +1,16 @@
+name: Maven Package
+
+on:
+  repository_dispatch:
+    types: [release]
+
+jobs:
+  build:
+    runs-on: [ubuntu-latest]
+    container:
+      image: ghcr.io/carlossg/maven:3.6.3-azulzulu-11-alpine
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build with Maven
+        run: mvn -B release:prepare release:perform -Dresume=false

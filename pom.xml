@@ -6,7 +6,8 @@
 
     <groupId>com.groww.infra</groupId>
     <artifactId>temporal-opentelemetry</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -16,6 +17,19 @@
         <logback.version>1.4.12</logback.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <scm>
+        <developerConnection>scm:git:git@github.com:Groww-OSS/temporal-opentelemetry.git</developerConnection>
+        <tag>@{project.version}</tag>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/Groww-OSS/temporal-opentelemetry</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-sdk -->
@@ -63,13 +77,10 @@
                 </configuration>
             </plugin>
 
-            <!-- Maven Spring Boot -->
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>3.0.0</version>
             </plugin>
 
         </plugins>
