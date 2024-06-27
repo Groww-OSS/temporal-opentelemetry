@@ -5,7 +5,6 @@
     <groupId>com.groww.infra</groupId>
     <artifactId>temporal-opentelemetry</artifactId>
     <version>${revision}</version>
-    <packaging>pom</packaging>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -68,26 +67,8 @@
                 <configuration>
                     <deployAtEnd>true</deployAtEnd>
                     <uniqueVersion>true</uniqueVersion>
-                    <pomFile>true</pomFile>
                     <generatePom>true</generatePom>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.6.0</version>
-                <configuration>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>flatten</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>flatten</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
         </plugins>
