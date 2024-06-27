@@ -5,7 +5,6 @@
     <groupId>com.groww.infra</groupId>
     <artifactId>temporal-opentelemetry</artifactId>
     <version>${revision}</version>
-    <packaging>pom</packaging>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -68,7 +67,6 @@
                 <configuration>
                     <deployAtEnd>true</deployAtEnd>
                     <uniqueVersion>true</uniqueVersion>
-                    <pomFile>true</pomFile>
                     <generatePom>true</generatePom>
                 </configuration>
             </plugin>
