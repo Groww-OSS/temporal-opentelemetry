@@ -5,7 +5,10 @@ import com.groww.infra.temporal.opentelemetry.OpenTelemetryOptions;
 import com.groww.infra.temporal.opentelemetry.SpanCreationContext;
 import com.groww.infra.temporal.opentelemetry.SpanOperationType;
 import com.groww.infra.temporal.opentelemetry.StandardTagNames;
-import io.opentelemetry.api.trace.*;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanBuilder;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +87,7 @@ public class SpanFactory {
       String signalName,
       String workflowId,
       String runId,
-      SpanContext workflowSignalSpanContext) {
+      Context workflowSignalSpanContext) {
     SpanCreationContext context =
         SpanCreationContext.newBuilder()
             .setSpanOperationType(SpanOperationType.HANDLE_SIGNAL)
@@ -92,7 +95,7 @@ public class SpanFactory {
             .setWorkflowId(workflowId)
             .setRunId(runId)
             .build();
-    return createSpan(context, tracer, workflowSignalSpanContext,  SpanKind.CLIENT);
+    return createSpan(context, tracer, workflowSignalSpanContext, SpanKind.CLIENT);
   }
 
   public SpanBuilder createContinueAsNewWorkflowStartSpan(
@@ -112,7 +115,7 @@ public class SpanFactory {
       String workflowType,
       String workflowId,
       String runId,
-      SpanContext workflowStartSpanContext) {
+      Context workflowStartSpanContext) {
     SpanCreationContext context =
         SpanCreationContext.newBuilder()
             .setSpanOperationType(SpanOperationType.RUN_WORKFLOW)
@@ -120,7 +123,7 @@ public class SpanFactory {
             .setWorkflowId(workflowId)
             .setRunId(runId)
             .build();
-    return createSpan(context, tracer, workflowStartSpanContext,  SpanKind.CLIENT);
+    return createSpan(context, tracer, workflowStartSpanContext, SpanKind.CLIENT);
   }
 
   public SpanBuilder createActivityStartSpan(
@@ -140,7 +143,7 @@ public class SpanFactory {
       String activityType,
       String workflowId,
       String runId,
-      SpanContext activityStartSpanContext) {
+      Context activityStartSpanContext) {
     SpanCreationContext context =
         SpanCreationContext.newBuilder()
             .setSpanOperationType(SpanOperationType.RUN_ACTIVITY)
@@ -148,7 +151,7 @@ public class SpanFactory {
             .setWorkflowId(workflowId)
             .setRunId(runId)
             .build();
-    return createSpan(context, tracer, activityStartSpanContext,  SpanKind.CLIENT);
+    return createSpan(context, tracer, activityStartSpanContext, SpanKind.CLIENT);
   }
 
   public SpanBuilder createWorkflowStartUpdateSpan(
@@ -168,7 +171,7 @@ public class SpanFactory {
       String updateName,
       String workflowId,
       String runId,
-      SpanContext workflowUpdateSpanContext) {
+      Context workflowUpdateSpanContext) {
     SpanCreationContext context =
         SpanCreationContext.newBuilder()
             .setSpanOperationType(SpanOperationType.HANDLE_UPDATE)
@@ -188,24 +191,24 @@ public class SpanFactory {
             .setWorkflowId(workflowId)
             .setRunId(runId)
             .build();
-    return createSpan(context, tracer, null,  SpanKind.CLIENT);
+    return createSpan(context, tracer, null, SpanKind.CLIENT);
   }
 
   public SpanBuilder createWorkflowHandleQuerySpan(
-      Tracer tracer, String queryName, SpanContext workflowQuerySpanContext) {
+      Tracer tracer, String queryName, Context workflowQuerySpanContext) {
     SpanCreationContext context =
         SpanCreationContext.newBuilder()
             .setSpanOperationType(SpanOperationType.HANDLE_QUERY)
             .setActionName(queryName)
             .build();
-    return createSpan(context, tracer, workflowQuerySpanContext,  SpanKind.CLIENT);
+    return createSpan(context, tracer, workflowQuerySpanContext, SpanKind.CLIENT);
   }
 
   public void logFail(Span toSpan, Throwable failReason) {
 
-    LoggingEventBuilder log =  logger.atError();
+    LoggingEventBuilder log = logger.atError();
     log.addKeyValue(StandardTagNames.FAILED, true);
-    log.addKeyValue("Error",options.getIsErrorPredicate().test(failReason));
+    log.addKeyValue("Error", options.getIsErrorPredicate().test(failReason));
 
     Map<String, Object> logPayload = new HashMap<>();
     log.addKeyValue("EVENT", "error");
@@ -226,29 +229,29 @@ public class SpanFactory {
   }
 
 
-
   private SpanBuilder createSpan(
       SpanCreationContext context,
       Tracer tracer,
-      @Nullable SpanContext parentSpanContext,
+      @Nullable Context parentSpanContext,
       @Nullable SpanKind kind) {
-    SpanContext parent;
+    Context parent;
 
     Span activeSpan = Span.fromContextOrNull(Context.current());
     if (activeSpan != null) {
-      parent = activeSpan.getSpanContext();
+      parent = Context.current().with(activeSpan);
     } else {
       parent = parentSpanContext;
     }
 
+
     SpanBuilder builder = options.getSpanBuilderProvider().createSpanBuilder(tracer, context);
 
-    if(kind != null) {
+    if (kind != null) {
       builder.setSpanKind(kind);
     }
 
     if (parent != null) {
-      builder.setParent(Context.current().with(Span.wrap(parent)));
+      builder.setParent(parent);
     }
 
     return builder;

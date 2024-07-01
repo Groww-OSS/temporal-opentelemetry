@@ -32,6 +32,8 @@ public class OpenTelemetryWorkflowOutboundCallsInterceptor
     this.contextAccessor = contextAccessor;
   }
 
+
+
   @Override
   public <R> ActivityOutput<R> executeActivity(ActivityInput<R> input) {
     if (!WorkflowUnsafe.isReplaying()) {
@@ -134,11 +136,11 @@ public class OpenTelemetryWorkflowOutboundCallsInterceptor
     Runnable wrappedRunnable =
         activeSpan != null
             ? () -> {
-              // transfer the existing active span into another thread
-              try (Scope ignored = activeSpan.makeCurrent()) {
-                runnable.run();
-              }
-            }
+          // transfer the existing active span into another thread
+          try (Scope ignored = activeSpan.makeCurrent()) {
+            runnable.run();
+          }
+        }
             : runnable;
     return super.newChildThread(wrappedRunnable, detached, name);
   }

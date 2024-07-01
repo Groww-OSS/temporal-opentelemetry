@@ -5,7 +5,7 @@ import io.opentelemetry.context.propagation.TextMapGetter;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-public enum TemporalHeaderGetter implements TextMapGetter<Map<String,String>> {
+public enum TemporalHeaderGetter implements TextMapGetter<Map<String, String>> {
   INSTANCE;
 
   @Override

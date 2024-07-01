@@ -39,6 +39,7 @@ public class OpenTelemetryWorkflowClientCallsInterceptor extends WorkflowClientC
       return super.start(input);
     } finally {
       workflowStartSpan.end();
+
     }
   }
 

@@ -17,7 +17,8 @@ public class ActionTypeAndNameSpanBuilderProvider implements SpanBuilderProvider
 
   private static final String PREFIX_DELIMITER = ":";
 
-  public ActionTypeAndNameSpanBuilderProvider() {}
+  public ActionTypeAndNameSpanBuilderProvider() {
+  }
 
   public SpanBuilder createSpanBuilder(Tracer tracer, SpanCreationContext context) {
     SpanBuilder spanBuilder = tracer.spanBuilder(this.getSpanName(context));

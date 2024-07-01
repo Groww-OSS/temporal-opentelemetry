@@ -1,9 +1,10 @@
 package com.groww.infra.temporal.opentelemetry.internal;
 
 import com.groww.infra.temporal.opentelemetry.OpenTelemetryOptions;
+import io.opentelemetry.api.internal.ImmutableSpanContext;
 import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.temporal.common.interceptors.WorkflowInboundCallsInterceptor;
@@ -40,7 +41,7 @@ public class OpenTelemetryWorkflowInboundCallsInterceptor
   public WorkflowOutput execute(WorkflowInput input) {
     Tracer tracer = options.getTracer();
     TextMapPropagator propagator = options.getPropagator();
-    SpanContext rootSpanContext =
+    Context rootSpanContext =
         contextAccessor.readSpanContextFromHeader(input.getHeader(), propagator);
     Span workflowRunSpan =
         spanFactory
@@ -51,7 +52,7 @@ public class OpenTelemetryWorkflowInboundCallsInterceptor
                 Workflow.getInfo().getRunId(),
                 rootSpanContext)
             .startSpan();
-    try (Scope ignored = workflowRunSpan.makeCurrent()) {
+    try (Scope ignored = rootSpanContext.with(workflowRunSpan).makeCurrent()) {
       return super.execute(input);
     } catch (Throwable t) {
       if (t instanceof DestroyWorkflowThreadError) {
@@ -69,7 +70,7 @@ public class OpenTelemetryWorkflowInboundCallsInterceptor
   public void handleSignal(SignalInput input) {
     Tracer tracer = options.getTracer();
     TextMapPropagator propagator = options.getPropagator();
-    SpanContext rootSpanContext =
+    Context rootSpanContext =
         contextAccessor.readSpanContextFromHeader(input.getHeader(), propagator);
     Span workflowSignalSpan =
         spanFactory
@@ -80,7 +81,7 @@ public class OpenTelemetryWorkflowInboundCallsInterceptor
                 Workflow.getInfo().getRunId(),
                 rootSpanContext)
             .startSpan();
-    try (Scope ignored = workflowSignalSpan.makeCurrent()) {
+    try (Scope ignored = rootSpanContext.with(workflowSignalSpan).makeCurrent()) {
       super.handleSignal(input);
     } catch (Throwable t) {
       if (t instanceof DestroyWorkflowThreadError) {
@@ -98,13 +99,13 @@ public class OpenTelemetryWorkflowInboundCallsInterceptor
   public QueryOutput handleQuery(QueryInput input) {
     Tracer tracer = options.getTracer();
     TextMapPropagator propagator = options.getPropagator();
-    SpanContext rootSpanContext =
+    Context rootSpanContext =
         contextAccessor.readSpanContextFromHeader(input.getHeader(), propagator);
     Span workflowQuerySpan =
         spanFactory
             .createWorkflowHandleQuerySpan(tracer, input.getQueryName(), rootSpanContext)
             .startSpan();
-    try (Scope ignored = workflowQuerySpan.makeCurrent()) {
+    try (Scope ignored = rootSpanContext.with(workflowQuerySpan).makeCurrent()) {
       return super.handleQuery(input);
     } catch (Throwable t) {
       if (t instanceof DestroyWorkflowThreadError) {
@@ -122,7 +123,7 @@ public class OpenTelemetryWorkflowInboundCallsInterceptor
   public UpdateOutput executeUpdate(UpdateInput input) {
     Tracer tracer = options.getTracer();
     TextMapPropagator propagator = options.getPropagator();
-    SpanContext rootSpanContext =
+    Context rootSpanContext =
         contextAccessor.readSpanContextFromHeader(input.getHeader(), propagator);
     Span workflowSignalSpan =
         spanFactory
@@ -133,7 +134,7 @@ public class OpenTelemetryWorkflowInboundCallsInterceptor
                 Workflow.getInfo().getRunId(),
                 rootSpanContext)
             .startSpan();
-    try (Scope ignored = workflowSignalSpan.makeCurrent()) {
+    try (Scope ignored = rootSpanContext.with(workflowSignalSpan).makeCurrent()) {
       return super.executeUpdate(input);
     } catch (Throwable t) {
       if (t instanceof DestroyWorkflowThreadError) {
