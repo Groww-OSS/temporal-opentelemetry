@@ -22,8 +22,8 @@ package com.groww.infra.temporal.opentelemetry.internal;
 
 import com.groww.infra.temporal.opentelemetry.OpenTelemetryOptions;
 import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.temporal.activity.ActivityExecutionContext;
@@ -33,11 +33,11 @@ import io.temporal.common.interceptors.ActivityInboundCallsInterceptorBase;
 
 public class OpenTelemetryActivityInboundCallsInterceptor
     extends ActivityInboundCallsInterceptorBase {
-  private final OpenTelemetryOptions options;
   private final SpanFactory spanFactory;
   private final Tracer tracer;
   private final TextMapPropagator propagator;
   private final ContextAccessor contextAccessor;
+  private ActivityExecutionContext activityExecutionContext;
 
   public OpenTelemetryActivityInboundCallsInterceptor(
       ActivityInboundCallsInterceptor next,
@@ -45,14 +45,11 @@ public class OpenTelemetryActivityInboundCallsInterceptor
       SpanFactory spanFactory,
       ContextAccessor contextAccessor) {
     super(next);
-    this.options = options;
     this.spanFactory = spanFactory;
     this.tracer = options.getTracer();
     this.propagator = options.getPropagator();
     this.contextAccessor = contextAccessor;
   }
-
-  private ActivityExecutionContext activityExecutionContext;
 
   @Override
   public void init(ActivityExecutionContext context) {
@@ -65,7 +62,7 @@ public class OpenTelemetryActivityInboundCallsInterceptor
 
   @Override
   public ActivityOutput execute(ActivityInput input) {
-    SpanContext rootSpanContext =
+    Context rootSpanContext =
         contextAccessor.readSpanContextFromHeader(input.getHeader(), propagator);
     ActivityInfo activityInfo = activityExecutionContext.getInfo();
     Span activityRunSpan =
@@ -77,7 +74,7 @@ public class OpenTelemetryActivityInboundCallsInterceptor
                 activityInfo.getRunId(),
                 rootSpanContext)
             .startSpan();
-    try (Scope scope = activityRunSpan.makeCurrent()) {
+    try (Scope scope = rootSpanContext.with(activityRunSpan).makeCurrent()) {
       return super.execute(input);
     } catch (Throwable t) {
       spanFactory.logFail(activityRunSpan, t);

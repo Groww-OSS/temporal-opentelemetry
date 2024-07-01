@@ -21,12 +21,8 @@
 package com.groww.infra.temporal.opentelemetry.codec;
 
 import com.groww.infra.temporal.opentelemetry.OpenTelemetrySpanContextCodec;
-import io.opentelemetry.api.trace.SpanContext;
-import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapPropagator;
-import io.opentelemetry.context.propagation.TextMapSetter;
-
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,9 +37,9 @@ public class TextMapInjectExtractCodec implements OpenTelemetrySpanContextCodec 
   @Override
   public Map<String, String> encode(Context context, TextMapPropagator propagator) {
     Map<String, String> serialized = new HashMap<>();
-    propagator.inject(context,serialized, SETTER);
+    propagator.inject(context, serialized, SETTER);
     return serialized;
-  };
+  }
 
   @Override
   public Context decode(Map<String, String> serializedSpanContext, TextMapPropagator propagator) {

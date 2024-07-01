@@ -26,6 +26,10 @@ public class SpanCreationContext {
     this.parentRunId = parentRunId;
   }
 
+  public static Builder newBuilder() {
+    return new Builder();
+  }
+
   public SpanOperationType getSpanOperationType() {
     return spanOperationType;
   }
@@ -55,10 +59,6 @@ public class SpanCreationContext {
     return parentRunId;
   }
 
-  public static Builder newBuilder() {
-    return new Builder();
-  }
-
   public static final class Builder {
     private SpanOperationType spanOperationType;
     private String actionName;
@@ -67,7 +67,8 @@ public class SpanCreationContext {
     private String parentWorkflowId;
     private String parentRunId;
 
-    private Builder() {}
+    private Builder() {
+    }
 
     public Builder setSpanOperationType(SpanOperationType spanOperationType) {
       this.spanOperationType = spanOperationType;

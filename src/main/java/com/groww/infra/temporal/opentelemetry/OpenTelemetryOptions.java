@@ -4,12 +4,10 @@ import com.google.common.base.MoreObjects;
 import com.groww.infra.temporal.opentelemetry.internal.ActionTypeAndNameSpanBuilderProvider;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.TextMapPropagator;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.time.format.TextStyle;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -22,10 +20,6 @@ public class OpenTelemetryOptions {
   private final SpanBuilderProvider spanBuilderProvider;
   private final OpenTelemetrySpanContextCodec spanContextCodec;
   private final Predicate<Throwable> isErrorPredicate;
-
-  public static OpenTelemetryOptions getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
 
   private OpenTelemetryOptions(
       Tracer tracer,
@@ -40,6 +34,14 @@ public class OpenTelemetryOptions {
     this.spanBuilderProvider = spanBuilderProvider;
     this.spanContextCodec = spanContextCodec;
     this.isErrorPredicate = isErrorPredicate;
+  }
+
+  public static OpenTelemetryOptions getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  public static Builder newBuilder() {
+    return new Builder();
   }
 
   @Nonnull
@@ -67,10 +69,6 @@ public class OpenTelemetryOptions {
     return isErrorPredicate;
   }
 
-  public static Builder newBuilder() {
-    return new Builder();
-  }
-
   public static final class Builder {
     private Tracer tracer;
     private TextMapPropagator propagator;
@@ -79,7 +77,8 @@ public class OpenTelemetryOptions {
         OpenTelemetrySpanContextCodec.TEXT_MAP_INJECT_EXTRACT_CODEC;
     private Predicate<Throwable> isErrorPredicate = t -> true;
 
-    private Builder() {}
+    private Builder() {
+    }
 
     public Builder setTracer(@Nullable Tracer tracer) {
       this.tracer = tracer;
@@ -94,7 +93,7 @@ public class OpenTelemetryOptions {
 
     /**
      * @param spanContextCodec custom {@link OpenTelemetrySpanContextCodec}, allows for more control
-     *     over how SpanContext is encoded and decoded from Map
+     *                         over how SpanContext is encoded and decoded from Map
      * @return this
      */
     public Builder setSpanContextCodec(@Nonnull OpenTelemetrySpanContextCodec spanContextCodec) {
