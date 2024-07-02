@@ -5,9 +5,11 @@ import com.groww.infra.temporal.opentelemetry.internal.ActionTypeAndNameSpanBuil
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.propagation.TextMapPropagator;
+import io.opentelemetry.semconv.SchemaUrls;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.temporal.Temporal;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -110,7 +112,12 @@ public class OpenTelemetryOptions {
 
     public OpenTelemetryOptions build() {
       return new OpenTelemetryOptions(
-          MoreObjects.firstNonNull(tracer, GlobalOpenTelemetry.get().getTracerProvider().tracerBuilder("temporal").build()),
+          MoreObjects.firstNonNull(tracer,
+              GlobalOpenTelemetry.get()
+                  .getTracerProvider()
+                  .tracerBuilder("io.temporal.opentelemetry")
+                  .setSchemaUrl(SchemaUrls.V1_25_0)
+                  .build()),
           MoreObjects.firstNonNull(propagator, GlobalOpenTelemetry.getPropagators().getTextMapPropagator()),
           spanBuilderProvider,
           spanContextCodec,
