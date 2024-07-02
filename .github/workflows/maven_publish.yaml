@@ -10,7 +10,7 @@ jobs:
     permissions:
       packages: write
     container:
-      image: ghcr.io/carlossg/maven:3.6.3-azulzulu-11-alpine
+      image: ghcr.io/carlossg/maven:3-azulzulu-11-alpine
     steps:
       - uses: actions/checkout@v4
 
