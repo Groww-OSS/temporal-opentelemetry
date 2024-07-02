@@ -10,9 +10,9 @@ jobs:
     permissions:
       packages: write
     container:
-      image: ghcr.io/carlossg/maven:3.6.3-azulzulu-11-alpine
+      image: ghcr.io/carlossg/maven:3-azulzulu-11-alpine
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Build with Maven
         run: mvn --settings settings.xml --file pom.xml  clean  deploy -Drevision=${{ github.event.release.tag_name }}
