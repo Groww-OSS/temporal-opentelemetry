@@ -33,7 +33,6 @@ public class OpenTelemetryWorkflowOutboundCallsInterceptor
   }
 
 
-
   @Override
   public <R> ActivityOutput<R> executeActivity(ActivityInput<R> input) {
     if (!WorkflowUnsafe.isReplaying()) {

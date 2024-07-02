@@ -1,7 +1,6 @@
 package com.groww.infra.temporal.opentelemetry.internal;
 
 import com.groww.infra.temporal.opentelemetry.OpenTelemetryOptions;
-import io.opentelemetry.api.internal.ImmutableSpanContext;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
