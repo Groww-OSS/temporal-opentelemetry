@@ -5,22 +5,19 @@ import com.groww.infra.temporal.opentelemetry.OpenTelemetryOptions;
 import com.groww.infra.temporal.opentelemetry.SpanCreationContext;
 import com.groww.infra.temporal.opentelemetry.SpanOperationType;
 import com.groww.infra.temporal.opentelemetry.StandardTagNames;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.spi.LoggingEventBuilder;
+import io.opentelemetry.semconv.ExceptionAttributes;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SpanFactory {
 
-  private static final Logger logger = LoggerFactory.getLogger(SpanFactory.class);
   private final OpenTelemetryOptions options;
 
   public SpanFactory(OpenTelemetryOptions options) {
@@ -205,23 +202,15 @@ public class SpanFactory {
   }
 
   public void logFail(Span toSpan, Throwable failReason) {
-
-    LoggingEventBuilder log = logger.atError();
-    log.addKeyValue(StandardTagNames.FAILED, true);
-    log.addKeyValue("Error", options.getIsErrorPredicate().test(failReason));
-
-    Map<String, Object> logPayload = new HashMap<>();
-    log.addKeyValue("EVENT", "error");
-    log.addKeyValue("ERROR_KIND", failReason.getClass().getName());
-    log.addKeyValue("ERROR_OBJECT", failReason);
-    log.addKeyValue("STACK", Throwables.getStackTraceAsString(failReason));
-
+    AttributesBuilder attributesBuilder = Attributes.builder()
+        .put(ExceptionAttributes.EXCEPTION_TYPE, failReason.getClass().getName())
+        .put(ExceptionAttributes.EXCEPTION_ESCAPED, true)
+        .put(ExceptionAttributes.EXCEPTION_STACKTRACE, Throwables.getStackTraceAsString(failReason));
     String message = failReason.getMessage();
     if (message != null) {
-      log.addKeyValue("MESSAGE", message);
+      toSpan.setAttribute(ExceptionAttributes.EXCEPTION_MESSAGE, message);
     }
-
-    log.log();
+    toSpan.recordException(failReason, attributesBuilder.build());
   }
 
   public void logEviction(Span toSpan) {
