@@ -46,7 +46,7 @@ public class ContextAccessor {
   public Context readSpanContextFromHeader(Header header, TextMapPropagator propagator) {
     Payload payload = header.getValues().get(TRACER_HEADER_KEY);
     if (payload == null) {
-      return null;
+      return Context.current();
     }
     @SuppressWarnings("unchecked")
     Map<String, String> serializedSpanContext =
